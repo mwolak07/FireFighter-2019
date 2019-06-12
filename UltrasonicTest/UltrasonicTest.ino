@@ -1,11 +1,11 @@
-int EchoRight = 2;
-int TrigRight = 3;
-int EchoFront = 4;
-int TrigFront = 5;
+int echoRight = 2;
+int trigRight = 3;
+int echoFront = 4;
+int trigFront = 5;
 
 /* Sends ultrasonic pulse out on specified pins and
 returns distance */
-int ultrasonicPulse(int trigger, int echo) {
+int getUltrasonicDistance(int trigger, int echo) {
   long duration;
   
   // Clears the trigger
@@ -25,16 +25,16 @@ int ultrasonicPulse(int trigger, int echo) {
 }
 
 void setup() {
-  pinMode(TrigRight, OUTPUT);
-  pinMode(EchoRight, INPUT);
-  pinMode(TrigFront, OUTPUT);
-  pinMode(EchoFront, INPUT);
+  pinMode(trigRight, OUTPUT);
+  pinMode(echoRight, INPUT);
+  pinMode(trigFront, OUTPUT);
+  pinMode(echoFront, INPUT);
   Serial.begin(9600);
 }
 
 void loop() {
   Serial.print("Front distance: ");
-  Serial.print(ultrasonicPulse(TrigFront, EchoFront));
+  Serial.print(ultrasonicPulse(trigFront, echoFront));
   Serial.print("    Right distance: ");
-  Serial.println(ultrasonicPulse(TrigRight, EchoRight));
+  Serial.println(ultrasonicPulse(trigRight, echoRight));
 }
