@@ -1,9 +1,9 @@
-int In1Right = 8;
-int In2Right = 9;
-int EnableRight = 6;
-int In1Left = 12;
-int In2Left = 13;
-int EnableLeft = 11;
+int in1Right = 8;
+int in2Right = 9;
+int enableRight = 6;
+int in1Left = 12;
+int in2Left = 13;
+int enableLeft = 11;
 
 /* Moves L & R motors in a turn with a ratio between inside and outside
  * pins on L298N driver are given to the method first
@@ -77,7 +77,7 @@ void movePointTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool 
  * speed_percentage --> percentage of full speed
  * time_delay --> how long the movement is held
  */
-void moveStrait(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool dir, float speed_percentage, int time_delay) {
+void moveStraight(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool dir, float speed_percentage, int time_delay) {
   // Sets direction based on dir
   if(dir) {
     digitalWrite(in1R, HIGH);
@@ -101,38 +101,38 @@ void moveStrait(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool dir
 }
 
 void setup() {
-  pinMode(In1Right, OUTPUT);
-  pinMode(In2Right, OUTPUT);
-  pinMode(EnableRight, OUTPUT);
-  pinMode(In1Left, OUTPUT);
-  pinMode(In2Left, OUTPUT);
-  pinMode(EnableLeft, OUTPUT);
+  pinMode(in1Right, OUTPUT);
+  pinMode(in2Right, OUTPUT);
+  pinMode(enableRight, OUTPUT);
+  pinMode(in1Left, OUTPUT);
+  pinMode(in2Left, OUTPUT);
+  pinMode(enableLeft, OUTPUT);
   Serial.begin(9600);
 }
 
 void loop() {
   Serial.println("Forward 50%");
-  moveStrait(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, true, 0.5, 500);
+  moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 0.5, 500);
   Serial.println("Forward 100%");
-  moveStrait(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, true, 1.0, 500);
+  moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 500);
   Serial.println("Backward 50%");
-  moveStrait(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, false, 0.5, 500);
+  moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 0.5, 500);
   Serial.println("Backward 100%");
-  moveStrait(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, false, 1.0, 500);
+  moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 500);
   Serial.println("Right Point Turn 50%");
-  movePointTurn(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, true, 0.5, 500);
+  movePointTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 0.5, 500);
   Serial.println("Right Point Turn 100%");
-  movePointTurn(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, true, 1.0, 500);
+  movePointTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 500);
   Serial.println("Left Point Turn 50%");
-  movePointTurn(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, false, 0.5, 500);
+  movePointTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 0.5, 500);
   Serial.println("Left Point Turn 100%");
-  movePointTurn(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, false, 1.0, 500);
+  movePointTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 500);
   Serial.println("Right 50% Ratio Turn 100% forward");
-  moveRatioTurn(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, true, true, 0.5, 1.0, 500);
+  moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, true, 0.5, 1.0, 500);
   Serial.println("Left 50% Ratio Turn 100% forward");
-  moveRatioTurn(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, true, false, 0.5, 1.0, 500);
+  moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, false, 0.5, 1.0, 500);
   Serial.println("Right 50% Ratio Turn 100% backward");
-  moveRatioTurn(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, false, true, 0.5, 1.0, 500);
+  moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, true, 0.5, 1.0, 500);
   Serial.println("Left 50% Ratio Turn 100% backward");
-  moveRatioTurn(In1Right, In2Right, EnableRight, In1Left, In2Left, EnableLeft, false, false, 0.5, 1.0, 500);
+  moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, false, 0.5, 1.0, 500);
 }
