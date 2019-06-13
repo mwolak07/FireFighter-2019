@@ -1,6 +1,6 @@
-int FSRight = A0;
+int FSRight = A2;
 int FSCenter = A1;
-int FSLeft = A2;
+int FSLeft = A0;
 
 void setup() {
   Serial.begin(9600);

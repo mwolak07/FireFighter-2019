@@ -9,7 +9,7 @@ Servo swatterServo;
  */
 void swat(Servo servo, int swatNumber, float holdTime, int maxAngle) {
   // Figures out movement delay
-  int moveDelay = int(float(maxAngle)/float(180)*850);
+  int moveDelay = int(float(maxAngle)/float(180)*1000);
   
   // Repeats swatting motion as specified by swatNumber
   for(int i=0; i < swatNumber; i++) {
@@ -24,11 +24,12 @@ void swat(Servo servo, int swatNumber, float holdTime, int maxAngle) {
 void setup() {
   swatterServo.attach(10);
   swatterServo.write(0); //Initialize servo to raised position
+  delay(850);
   Serial.begin(9600);
 }
 
 void loop() {
   Serial.println("Swatting 4 times");
-  swat(swatterServo, 4, 0.5, 100);
+  swat(swatterServo, 4, 0.5, 15);
   delay(2000);
 }

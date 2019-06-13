@@ -128,9 +128,9 @@ void loop() {
   moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 0.75, 2000);
   delay(1000);
   */
-  /* 
+  /*
   Serial.println("Backward 100%");
-  moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 2000);
+  moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 2000);
   delay(1000);
   */
   /*
