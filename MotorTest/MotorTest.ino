@@ -7,7 +7,7 @@ int enableLeft = 11;
 
 /* Moves L & R motors in a turn with a ratio between inside and outside
  * pins on L298N driver are given to the method first
- * dir --> true = forward, false = backward
+ * dir --> true = forward, false hq= backward
  * turn --> true = right, false = left
  * ratio --> sets ratio between wheels for turn radius
  * speed_percentage --> percentage of full speed
@@ -123,45 +123,35 @@ void setup() {
 }
 
 void loop() {
-  /*
   Serial.println("Forward 100%");
   moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 0.75, 2000);
   delay(1000);
-  */
-  /*
+  
   Serial.println("Backward 100%");
   moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 2000);
   delay(1000);
-  */
-  /*
+  
   Serial.println("Right Point Turn 100%");
   movePointTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 2000);
   delay(1000);
-  */
-  /*
+  
   Serial.println("Left Point Turn 100%");
   movePointTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 2000);
   delay(1000);
-  */
-  /*
+  
   Serial.println("Right 50% Ratio Turn 100% forward");
   moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, true, 0.5, 1.0, 2000);
   delay(1000);
-  */
-  /*
+  
   Serial.println("Left 50% Ratio Turn 100% forward");
   moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, false, 0.5, 1.0, 2000);
   delay(1000);
-  */
-  /*
+  
   Serial.println("Right 50% Ratio Turn 100% backward");
   moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, true, 0.5, 1.0, 2000);
   delay(1000);
-  */
-  /*
+  
   Serial.println("Left 50% Ratio Turn 100% backward");
   moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, false, 0.5, 1.0, 2000);
   delay(1000);
-  */
-  
 }
