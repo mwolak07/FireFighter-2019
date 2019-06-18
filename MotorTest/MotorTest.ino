@@ -1,9 +1,9 @@
 int in1Right = 8;
 int in2Right = 9;
-int enableRight = 6;
+int enableRight = 11;
 int in1Left = 12;
 int in2Left = 13;
-int enableLeft = 11;
+int enableLeft = 6;
 
 /* Moves L & R motors in a turn with a ratio between inside and outside
  * pins on L298N driver are given to the method first
@@ -123,6 +123,7 @@ void setup() {
 }
 
 void loop() {
+  
   Serial.println("Forward 100%");
   moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 0.75, 2000);
   delay(1000);
@@ -154,4 +155,5 @@ void loop() {
   Serial.println("Left 50% Ratio Turn 100% backward");
   moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, false, 0.5, 1.0, 2000);
   delay(1000);
+  
 }

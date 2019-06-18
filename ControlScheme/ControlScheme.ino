@@ -2,10 +2,10 @@
 
 int in1Right = 8;
 int in2Right = 9;
-int enableRight = 6;
+int enableRight = 11;
 int in1Left = 12;
 int in2Left = 13;
-int enableLeft = 11;
+int enableLeft = 6;
 int echoRight = 4;
 int trigRight = 5;
 int echoFront = 2;
@@ -36,7 +36,7 @@ void swat(Servo servo, int swatNumber, float holdTime, int maxAngle) {
 
 /* Sends ultrasonic pulse out on specified pins and
   returns distance */
-int getUltrasonicDistance(int trigger, int echo) {
+int getUltrasonicDistance(int trigger, int echo, int timeout) {
   long duration;
 
   // Clears the trigger
@@ -49,7 +49,7 @@ int getUltrasonicDistance(int trigger, int echo) {
   digitalWrite(trigger, LOW);
 
   // Reads the echo pin, getting travel time
-  duration = pulseIn(echo, HIGH);
+  duration = pulseIn(echo, HIGH, timeout);
 
   // Calculating distance
   return (duration * 0.034 / 2);
@@ -63,7 +63,7 @@ int getUltrasonicDistance(int trigger, int echo) {
    speed_percentage --> percentage of full speed
    time_delay --> how long the movement is held
 */
-void moveRatioTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool dir, bool turn, float ratio, float speed_percentage, int time_delay) {
+void moveRatioTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool dir, bool turn, float speed_percentage, float ratio, int time_delay) {
   // Sets direction based on dir
   if (dir) {
     digitalWrite(in1R, LOW);
@@ -162,6 +162,49 @@ void moveStraight(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool d
   analogWrite(ER, 0);
 }
 
+/* Control scheme for when no flame is detected
+   Turns left if a wall is detected in front (ultrasonic)
+   Uses ratio turns to maintain distance from the right wall (ultrasonic)
+ */
+void initialControl(int minDistance, int maxDistance, int blankDistance) {
+  // Initial ultrasonic sensor values
+  int frontDistance = getUltrasonicDistance(trigFront, echoFront, 10000);
+  int rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
+  Serial.println(rightDistance);
+
+  // Ensures ultrasonics aren't timing out
+  if(rightDistance !=0 && rightDistance < blankDistance) {
+    // Robot too close to the wall, goes left
+    if(rightDistance < minDistance) {
+      moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 0.4, 150); // Turn out
+      // Moves away until distance is correct
+      while(rightDistance < minDistance) {
+        moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 10);
+        rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
+        Serial.println(rightDistance);
+      }
+      moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 0.4, 150); // Strighten out
+    }
+
+    // Robot too far from the wall, goes right
+    else if(rightDistance > maxDistance) {
+      moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 0.4, 150); // Turn in
+      // Moves away until distance is correct
+      while(rightDistance > maxDistance) {
+        moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 10);
+        rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
+        Serial.println(rightDistance);
+      }
+      moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 0.4, 150); // Strighten out
+    }
+
+    // Goes straight if everything is OK
+    else {
+      moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 10);
+    }
+  }
+}
+
 void setup() {
   pinMode(FSRight, INPUT);
   pinMode(FSCenter, INPUT);
@@ -183,12 +226,5 @@ void setup() {
 }
 
 void loop() {
-  moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 5);
-
-  // Checks for obstacle in front
-  int distance = getUltrasonicDistance(trigFront, echoFront);
-  Serial.println(distance);
-  if (distance < 15) {
-    moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, true, 0.2, 0.85, 750);
-  }
+  initialControl(10, 20, 30);
 }
