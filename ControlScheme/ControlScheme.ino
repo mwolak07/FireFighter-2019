@@ -35,7 +35,7 @@ void swat(Servo servo, int swatNumber, float holdTime, int maxAngle) {
 }
 
 /* Sends ultrasonic pulse out on specified pins and
-  returns distance */
+  returns distance, along with timout for pulse in microseconds*/
 int getUltrasonicDistance(int trigger, int echo, int timeout) {
   long duration;
 
