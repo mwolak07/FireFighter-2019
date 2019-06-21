@@ -250,11 +250,16 @@ void flameControl() {
       centerReading = analogRead(FSCenter);
     }
   }
-
+  
   // The flame is within swatting range
   else if (centerReading < 500 & rightReading < 500 && leftReading < 500) {
     swat(swatterServo, 4, 0.5, 30);
     delay(1000);
+  }
+
+  // Both outside sensors detect the flame
+  else if(rightReading < 500 && leftReading < 500) {
+    moveStraight(true, 1.0, 10);
   }
 }
 
