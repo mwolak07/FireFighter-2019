@@ -288,8 +288,7 @@ void setup() {
 }
 
 void loop() {
-  bool isFlame = checkForFlames();
-  if (isFlame) {
+  if (checkForFlames()) {
     flameControl();
   } else {
     initialControl(7, 12, 22);
