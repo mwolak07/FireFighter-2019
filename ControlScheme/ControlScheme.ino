@@ -212,7 +212,7 @@ void initialControl(int minDistance, int maxDistance, int blankDistance) {
 
 }
 
-
+// Checks if there is a flame within the vicinity of the robot
 bool checkForFlames() {
   int rightReading = analogRead(FSRight);
   int centerReading = analogRead(FSCenter);
@@ -221,7 +221,6 @@ bool checkForFlames() {
   if (rightReading < 500 || centerReading < 500 || leftReading < 500) {
     return true;
   }
-
   return false
 }
 
