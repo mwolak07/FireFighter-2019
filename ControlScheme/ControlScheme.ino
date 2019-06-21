@@ -14,7 +14,7 @@ int FSRight = A2;
 int FSCenter = A1;
 int FSLeft = A0;
 int rightSpeed = 255;
-int leftSpeed = 120; // Lower Value accounts for difference in hardware motor speed
+int leftSpeed = 100; // Lower Value accounts for difference in hardware motor speed
 
 bool isFlame = false;
 
@@ -172,18 +172,18 @@ void moveStraight(bool dir, float speed_percentage, int time_delay) {
    Uses ratio turns to maintain distance from the right wall (ultrasonic)
 */
 void wallControl(int minDistance, int maxDistance, int blankDistance) {
-  int straightTime = 900;
-  int turnTime = 360;
+  int straightTime = 750;
+  int turnTime = 250;
 
   int rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
   int frontDistance = getUltrasonicDistance(trigFront, echoFront, 10000);
   Serial.print("Front distance: ");
   Serial.print(frontDistance);
-  Serial.print("Right distance: ");
+  Serial.print("  Right distance: ");
   Serial.println(rightDistance);
 
   // Checks for obstacle in front
-  if (frontDistance > 15 || frontDistance == 0) {
+  if (frontDistance > 22 || frontDistance == 0) {
     // Ensures robot has wall on right, not empty space
     if (rightDistance != 0 && rightDistance < blankDistance) {
       moveStraight(true, 1.0, straightTime);
@@ -201,12 +201,12 @@ void wallControl(int minDistance, int maxDistance, int blankDistance) {
     // Empty space to the right, robot turns 90 degrees right
     else {
       moveRatioTurn(true, true, 1.0, 0.0, 2200);
-      moveStraight(true, 1.0, 2200);
+      moveStraight(true, 1.0, 2500);
     }
   }
   // Obstacle is in front
   else {
-    moveRatioTurn(true, false, 1.0, 0.0, 1800);
+    moveRatioTurn(true, false, 1.0, 0.0, 2200);
   }
 
 
@@ -232,20 +232,22 @@ void flameControl() {
   int leftReading = analogRead(FSLeft);
 
   // Flame is on the right
-  if (rightReading < 500 && leftReading > 500) {
+  if (rightReading < 500 && leftReading > 500 && centerReading > 500) {
     // Waits for left sensor
     while (leftReading > 500) {
       moveRatioTurn(true, true, 1.0, 0.0, 5);
       leftReading = analogRead(FSLeft);
+      centerReading = analogRead(FSCenter);
     }
   }
 
   // Flame is on the left
-  else if (leftReading < 500 && rightReading > 500) {
+  else if (leftReading < 500 && rightReading > 500 && centerReading > 500) {
     // Waits for right sensor
     while (rightReading > 500) {
       moveRatioTurn(true, false, 1.0, 0.0, 5);
       rightReading = analogRead(FSRight);
+      centerReading = analogRead(FSCenter);
     }
   }
 
@@ -275,16 +277,18 @@ void setup() {
   swatterServo.write(0); //Initialize servo to raised position
 
   // Initializing ultrasonics
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 10; i++) {
     getUltrasonicDistance(trigFront, echoFront, 10000);
     getUltrasonicDistance(trigRight, echoRight, 10000);
   }
 
   delay(3000); // Initial delay, minimum 850 to wait for servo
   Serial.begin(9600);
+  Serial.println("Setup complete");
 }
 
 void loop() {
+  /*
     // Checking for flames and making sure isFlame has not already been set
     if (!isFlame && checkForFlames()) {
       isFlame = true;
@@ -295,6 +299,8 @@ void loop() {
     }
     // Flame not detected, use wall control
     else {
-      wallControl(8, 13, 23);
+      wallControl(15, 20, 40);
     }
+    */
+    flameControl();
 }

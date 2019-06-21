@@ -5,7 +5,7 @@ int in1L = 12;
 int in2L = 13;
 int EL = 6;
 int rightSpeed = 255; // Account for differences in motor speed
-int leftSpeed = 120;
+int leftSpeed = 100;
 
 /* Moves L & R motors in a turn with a ratio between inside and outside
    pins on L298N driver are given to the method first
