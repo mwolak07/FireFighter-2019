@@ -172,22 +172,16 @@ void moveStraight(bool dir, float speed_percentage, int time_delay) {
    Uses ratio turns to maintain distance from the right wall (ultrasonic)
 */
 void wallControl(int minDistance, int maxDistance, int blankDistance) {
-  int straightTime = 375;
-  int turnTime = 150;
+  int straightTime = 750;
+  int turnTime = 300;
 
   int rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
   int frontDistance = getUltrasonicDistance(trigFront, echoFront, 10000);
-
-  Serial.print(frontDistance);
-  Serial.print("  ");
-  Serial.println(rightDistance);
 
   // Checks for obstacle in front
   if (frontDistance > 15 || frontDistance == 0) {
     // Ensures robot has wall on right, not empty space
     if (rightDistance != 0 && rightDistance < blankDistance) {
-      moveStraight(true, 1.0, straightTime); // Maybe put this after the turns?
-
       // Too close to wall, turns left
       if (rightDistance < minDistance) {
         moveRatioTurn(true, false, 1.0, 0.0, turnTime);
@@ -197,6 +191,8 @@ void wallControl(int minDistance, int maxDistance, int blankDistance) {
       else if (rightDistance > maxDistance) {
         moveRatioTurn(true, true, 1.0, 0.0, turnTime);
       }
+
+      moveStraight(true, 1.0, straightTime);
     }
     // Empty space to the right, robot turns 90 degrees right
     else {
@@ -206,7 +202,6 @@ void wallControl(int minDistance, int maxDistance, int blankDistance) {
   }
   // Obstacle is in front
   else {
-    Serial.println("OBSTACLE");
     moveRatioTurn(true, false, 1.0, 0.0, 1000);
   }
 
