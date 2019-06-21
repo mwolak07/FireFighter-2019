@@ -214,10 +214,10 @@ void initialControl(int minDistance, int maxDistance, int blankDistance) {
 
 // Checks if there is a flame within the vicinity of the robot
 bool checkForFlames() {
-  if (analogRead(FSRight) < 500 || analogRead(FSCenter) < 500 || analogRead(FSLeft) < 500) {
+  if (analogRead(FSRight); < 500 || analogRead(FSCenter); < 500 || analogRead(FSLeft); < 500) {
     return true;
   }
-  return false;
+  return false
 }
 
 
@@ -273,7 +273,7 @@ void setup() {
 
   swatterServo.attach(10);
   swatterServo.write(0); //Initialize servo to raised position
-
+  
   // Initializing ultrasonics
   for (int i = 0; i < 5; i++) {
     getUltrasonicDistance(trigFront, echoFront, 10000);
