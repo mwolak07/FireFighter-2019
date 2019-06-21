@@ -284,6 +284,7 @@ void setup() {
 }
 
 void loop() {
+  // Decides which control scheme to use based on presence of flames
   if (checkForFlames()) {
     flameControl();
   } else {
