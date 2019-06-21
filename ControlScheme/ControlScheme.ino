@@ -172,8 +172,8 @@ void moveStraight(bool dir, float speed_percentage, int time_delay) {
    Uses ratio turns to maintain distance from the right wall (ultrasonic)
 */
 void wallControl(int minDistance, int maxDistance, int blankDistance) {
-  int straightTime = 375;
-  int turnTime = 150;
+  int straightTime = 750;
+  int turnTime = 300;
 
   int rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
   int frontDistance = getUltrasonicDistance(trigFront, echoFront, 10000);
