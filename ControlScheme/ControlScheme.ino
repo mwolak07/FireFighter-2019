@@ -200,13 +200,13 @@ void wallControl(int minDistance, int maxDistance, int blankDistance) {
     }
     // Empty space to the right, robot turns 90 degrees right
     else {
-      moveRatioTurn(true, true, 1.0, 0.0, 1500);
+      moveRatioTurn(true, true, 1.0, 0.0, 3000);
       moveStraight(true, 1.0, 750);
     }
   }
   // Obstacle is in front
   else {
-    moveRatioTurn(true, false, 1.0, 0.0, 1000);
+    moveRatioTurn(true, false, 1.0, 0.0, 2000);
   }
 
 
