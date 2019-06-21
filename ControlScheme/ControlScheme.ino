@@ -16,6 +16,8 @@ int FSLeft = A0;
 int rightSpeed = 255;
 int leftSpeed = 245; // Lower Value accounts for difference in hardware motor speed
 
+bool flameMode = false;
+
 
 Servo swatterServo;
 
@@ -181,33 +183,40 @@ void initialControl(int minDistance, int maxDistance, int blankDistance) {
   Serial.print("  ");
   Serial.println(rightDistance);
 
-  // Checks for obstacle in front
-  if (frontDistance > 15 || frontDistance == 0) {
-    // Ensures robot has wall on right, not empty space
-    if (rightDistance != 0 && rightDistance < blankDistance) {
-      moveStraight(true, 1.0, straightTime); // Maybe put this after the turns?
+  flameControl(); // Check if flames are within range
 
-      // Too close to wall, turns left
-      if (rightDistance < minDistance) {
-        moveRatioTurn(true, false, 1.0, 0.0, turnTime);
+  // There are no flames near the robot
+  if (!flameMode) {
+    // Checks for obstacle in front
+    if (frontDistance > 15 || frontDistance == 0) {
+      // Ensures robot has wall on right, not empty space
+      if (rightDistance != 0 && rightDistance < blankDistance) {
+        moveStraight(true, 1.0, straightTime); // Maybe put this after the turns?
+
+        // Too close to wall, turns left
+        if (rightDistance < minDistance) {
+          moveRatioTurn(true, false, 1.0, 0.0, turnTime);
+        }
+
+        // Too far from wall, turns right
+        else if (rightDistance > maxDistance) {
+          moveRatioTurn(true, true, 1.0, 0.0, turnTime);
+        }
       }
-
-      // Too far from wall, turns right
-      else if (rightDistance > maxDistance) {
-        moveRatioTurn(true, true, 1.0, 0.0, turnTime);
+      // Empty space to the right, robot turns 90 degrees right
+      else {
+        moveRatioTurn(true, true, 1.0, 0.0, 1500);
+        moveStraight(true, 1.0, 750);
       }
     }
-    // Empty space to the right, robot turns 90 degrees right
+    // Obstacle is in front
     else {
-      moveRatioTurn(true, true, 1.0, 0.0, 1500);
-      moveStraight(true, 1.0, 750);
+      Serial.println("OBSTACLE");
+      moveRatioTurn(true, false, 1.0, 0.0, 1000);
     }
   }
-  // Obstacle is in front
-  else {
-    Serial.println("OBSTACLE");
-    moveRatioTurn(true, false, 1.0, 0.0, 1000);
-  }
+
+
 }
 /* Moves robot to the flame source
    If the flame is on the left, robot ratio turns left until right detects it
@@ -221,6 +230,8 @@ void flameControl() {
 
   // Flame is on the right
   if (rightReading < 500 && leftReading > 500) {
+    flameMode = true; // A flame has been detected
+
     // Waits for left sensor
     while (leftReading > 500) {
       moveRatioTurn(true, true, 1.0, 0.0, 5);
@@ -230,6 +241,8 @@ void flameControl() {
 
   // Flame is on the left
   else if (leftReading < 500 && rightReading > 500) {
+    flameMode = true; // A flame has been detected
+
     // Waits for right sensor
     while (rightReading > 500) {
       moveRatioTurn(true, false, 1.0, 0.0, 5);
@@ -238,9 +251,15 @@ void flameControl() {
   }
 
   // The flame is within swatting range
-  if (centerReading < 500 || (rightReading < 500 && leftReading < 500)) {
+  else if (centerReading < 500 || (rightReading < 500 && leftReading < 500)) {
+    flameMode = true; // A flame has been detected
+
     swat(swatterServo, 4, 0.5, 15);
     delay(1000);
+  }
+
+  else {
+    flameMode = false;
   }
 }
 
@@ -258,8 +277,10 @@ void setup() {
   pinMode(echoRight, INPUT);
   pinMode(trigFront, OUTPUT);
   pinMode(echoFront, INPUT);
+
   swatterServo.attach(10);
   swatterServo.write(0); //Initialize servo to raised position
+
   // Initializing ultrasonics
   for (int i = 0; i < 5; i++) {
     getUltrasonicDistance(trigFront, echoFront, 10000);
@@ -271,5 +292,4 @@ void setup() {
 
 void loop() {
   initialControl(7, 12, 22);
-  flameControl();
 }
