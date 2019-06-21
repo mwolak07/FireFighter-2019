@@ -33,8 +33,8 @@ void setup() {
 }
 
 void loop() {
-  Serial.print("Front distance: ");
-  Serial.print(getUltrasonicDistance(trigFront, echoFront));
+  //Serial.print("Front distance: ");
+  //Serial.print(getUltrasonicDistance(trigFront, echoFront, 10000));
   Serial.print("    Right distance: ");
-  Serial.println(getUltrasonicDistance(trigRight, echoRight));
+  Serial.println(getUltrasonicDistance(trigRight, echoRight, 10000));
 }

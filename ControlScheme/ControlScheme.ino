@@ -1,11 +1,11 @@
 #include<Servo.h>
 
-int in1Right = 8;
-int in2Right = 9;
-int enableRight = 11;
-int in1Left = 12;
-int in2Left = 13;
-int enableLeft = 6;
+int in1R = 8;
+int in2R = 9;
+int ER = 11;
+int in1L = 12;
+int in2L = 13;
+int EL = 6;
 int echoRight = 4;
 int trigRight = 5;
 int echoFront = 2;
@@ -13,6 +13,10 @@ int trigFront = 3;
 int FSRight = A2;
 int FSCenter = A1;
 int FSLeft = A0;
+int rightSpeed = 255; // Account for differences in motor speed
+int leftSpeed = 245;
+
+
 Servo swatterServo;
 
 /* Performs swatting motion to extinguish flame
@@ -63,7 +67,7 @@ int getUltrasonicDistance(int trigger, int echo, int timeout) {
    speed_percentage --> percentage of full speed
    time_delay --> how long the movement is held
 */
-void moveRatioTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool dir, bool turn, float speed_percentage, float ratio, int time_delay) {
+void moveRatioTurn(bool dir, bool turn, float speed_percentage, float ratio, int time_delay) {
   // Sets direction based on dir
   if (dir) {
     digitalWrite(in1R, LOW);
@@ -80,12 +84,12 @@ void moveRatioTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool 
 
   // Sets movement speed
   if (turn) {
-    analogWrite(ER, int(255 * speed_percentage * ratio));
-    analogWrite(EL, int(255 * speed_percentage));
+    analogWrite(ER, int(rightSpeed * speed_percentage * ratio));
+    analogWrite(EL, int(leftSpeed * speed_percentage));
   }
   else {
-    analogWrite(ER, int(255 * speed_percentage));
-    analogWrite(EL, int(255 * speed_percentage * ratio));
+    analogWrite(ER, int(rightSpeed * speed_percentage));
+    analogWrite(EL, int(leftSpeed * speed_percentage * ratio));
   }
 
   // Sets duration of pulse
@@ -102,7 +106,7 @@ void moveRatioTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool 
    speed_percentage --> percentage of full speed
    time_delay --> how long the movement is held
 */
-void movePointTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool turn, float speed_percentage, int time_delay) {
+void movePointTurn(bool turn, float speed_percentage, int time_delay) {
   // Sets direction based on turn
   if (turn) {
     digitalWrite(in1R, HIGH);
@@ -118,8 +122,8 @@ void movePointTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool 
   }
 
   // Sets movement speed
-  analogWrite(ER, int(255 * speed_percentage));
-  analogWrite(EL, int(255 * speed_percentage));
+  analogWrite(ER, int(rightSpeed * speed_percentage));
+  analogWrite(EL, int(leftSpeed * speed_percentage));
 
   // Sets duration of pulse
   delay(time_delay);
@@ -135,7 +139,7 @@ void movePointTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool 
    speed_percentage --> percentage of full speed
    time_delay --> how long the movement is held
 */
-void moveStraight(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool dir, float speed_percentage, int time_delay) {
+void moveStraight(bool dir, float speed_percentage, int time_delay) {
   // Sets direction based on dir (true = forward, false = backward)
   if (dir) {
     digitalWrite(in1R, LOW);
@@ -151,8 +155,8 @@ void moveStraight(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool d
   }
 
   // Sets movement speed
-  analogWrite(ER, int(255 * speed_percentage));
-  analogWrite(EL, int(255 * speed_percentage));
+  analogWrite(ER, int(rightSpeed * speed_percentage));
+  analogWrite(EL, int(leftSpeed * speed_percentage));
 
   // Sets duration of pulse
   delay(time_delay);
@@ -165,43 +169,76 @@ void moveStraight(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool d
 /* Control scheme for when no flame is detected
    Turns left if a wall is detected in front (ultrasonic)
    Uses ratio turns to maintain distance from the right wall (ultrasonic)
- */
+*/
 void initialControl(int minDistance, int maxDistance, int blankDistance) {
-  // Initial ultrasonic sensor values
-  int frontDistance = getUltrasonicDistance(trigFront, echoFront, 10000);
+  int straightTime = 375;
+  int turnTime = 150;
+
   int rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
+  int frontDistance = getUltrasonicDistance(trigFront, echoFront, 10000);
+  Serial.print(frontDistance);
+  Serial.print("  ");
   Serial.println(rightDistance);
 
-  // Ensures ultrasonics aren't timing out
-  if(rightDistance !=0 && rightDistance < blankDistance) {
-    // Robot too close to the wall, goes left
-    if(rightDistance < minDistance) {
-      moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 0.4, 150); // Turn out
-      // Moves away until distance is correct
-      while(rightDistance < minDistance) {
-        moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 10);
-        rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
-        Serial.println(rightDistance);
-      }
-      moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 0.4, 150); // Strighten out
-    }
+  // Checks for obstacle in front
+  if(frontDistance > 15 || frontDistance == 0) {
+    // Ensures robot has wall on right, not empty space
+    if(rightDistance != 0 && rightDistance < blankDistance) {
+      moveStraight(true, 1.0, straightTime);
 
-    // Robot too far from the wall, goes right
-    else if(rightDistance > maxDistance) {
-      moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 0.4, 150); // Turn in
-      // Moves away until distance is correct
-      while(rightDistance > maxDistance) {
-        moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 10);
-        rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
-        Serial.println(rightDistance);
+      // Too close to wall, turns left
+      if(rightDistance < minDistance) {
+        moveRatioTurn(true, false, 1.0, 0.0, turnTime);
       }
-      moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 0.4, 150); // Strighten out
-    }
 
-    // Goes straight if everything is OK
+      // Too far from wall, turns right
+      else if(rightDistance > maxDistance) {
+        moveRatioTurn(true, true, 1.0, 0.0, turnTime);
+      }
+    }
+    // Empty space to the right, robot turns 90 degrees right
     else {
-      moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 10);
+      moveRatioTurn(true, true, 1.0, 0.0, 1500);
+      moveStraight(true, 1.0, 750);
     }
+  }
+  // Obstacle is in front
+  else {
+    Serial.println("OBSTACLE");
+    moveRatioTurn(true, false, 1.0, 0.0, 1000);
+  }
+}
+ /* Moves robot to the flame source
+    If the flame is on the left, robot ratio turns left until right detects it
+    If the flame is on the right, robot ratio turns right until left detects it
+    If the less sensitive center detects something, robot is close, and swatter is activated
+  */
+void flameControl() {
+  int rightReading = analogRead(FSRight);
+  int centerReading = analogRead(FSCenter);
+  int leftReading = analogRead(FSLeft);
+
+  // Flame is on the right
+  if(rightReading < 500 && leftReading > 500) {
+    // Waits for left sensor
+    while(leftReading > 500) {
+      moveRatioTurn(true, true, 1.0, 0.0, 5);
+      leftReading = analogRead(FSLeft);
+    }
+  }
+
+  // Flame is on the left
+  else if(leftReading < 500 && rightReading > 500) {
+    // Waits for right sensor
+    while(rightReading > 500) {
+      moveRatioTurn(true, false, 1.0, 0.0, 5);
+      rightReading = analogRead(FSRight);
+    }
+  }
+
+  // Center has detected it, swat the flame
+  else if(centerReading < 500 || (rightReading < 500 && leftReading < 500)) {
+    swat(swatterServo, 4, 0.5, 15);
   }
 }
 
@@ -209,22 +246,55 @@ void setup() {
   pinMode(FSRight, INPUT);
   pinMode(FSCenter, INPUT);
   pinMode(FSLeft, INPUT);
-  pinMode(in1Right, OUTPUT);
-  pinMode(in2Right, OUTPUT);
-  pinMode(enableRight, OUTPUT);
-  pinMode(in1Left, OUTPUT);
-  pinMode(in2Left, OUTPUT);
-  pinMode(enableLeft, OUTPUT);
+  pinMode(in1R, OUTPUT);
+  pinMode(in2R, OUTPUT);
+  pinMode(ER, OUTPUT);
+  pinMode(in1L, OUTPUT);
+  pinMode(in2L, OUTPUT);
+  pinMode(EL, OUTPUT);
   pinMode(trigRight, OUTPUT);
   pinMode(echoRight, INPUT);
   pinMode(trigFront, OUTPUT);
   pinMode(echoFront, INPUT);
   swatterServo.attach(10);
   swatterServo.write(0); //Initialize servo to raised position
-  delay(850);
+  // Initializing ultrasonics
+  for(int i = 0; i < 5; i++) {
+    getUltrasonicDistance(trigFront, echoFront, 10000);
+    getUltrasonicDistance(trigRight, echoRight, 10000);
+  }
+  delay(3000); // Minimum 850 for servo
   Serial.begin(9600);
 }
 
 void loop() {
-  initialControl(10, 20, 30);
+  // initialControl(7, 12, 22);
+  // flameControl();
+
+  int rightReading = analogRead(FSRight);
+  int centerReading = analogRead(FSCenter);
+  int leftReading = analogRead(FSLeft);
+  
+  // Center has detected it, swat the flame
+  if(centerReading < 500 || (rightReading < 500 && leftReading < 500)) {
+    swat(swatterServo, 4, 0.5, 15);
+    delay(1000);
+  }
+  /*
+    moveStraight(true, 1.0, 10);
+  */
+  /*
+    int turnTime = 475;
+    int turnAngle = 0.0;
+    moveRatioTurn(true, false, 1.0, turnAngle, turnTime); // Turns out
+    moveStraight(true, 1.0, 750);
+    moveRatioTurn(true, true, 1.0, turnAngle, turnTime); // Straightens out
+    delay(1000);
+    moveStraight(true, 1.0, 1000);
+    delay(1000);
+    moveRatioTurn(true, true, 1.0, turnAngle, turnTime); // Turns out
+    moveStraight(true, 1.0, 750);
+    moveRatioTurn(true, false, 1.0, turnAngle, turnTime); // Straightens out
+    delay(1000);
+  */
 }

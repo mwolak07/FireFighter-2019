@@ -1,9 +1,11 @@
-int in1Right = 8;
-int in2Right = 9;
-int enableRight = 11;
-int in1Left = 12;
-int in2Left = 13;
-int enableLeft = 6;
+int in1R = 8;
+int in2R = 9;
+int ER = 11;
+int in1L = 12;
+int in2L = 13;
+int EL = 6;
+int rightSpeed = 255; // Account for differences in motor speed
+int leftSpeed = 250;
 
 /* Moves L & R motors in a turn with a ratio between inside and outside
    pins on L298N driver are given to the method first
@@ -13,7 +15,7 @@ int enableLeft = 6;
    speed_percentage --> percentage of full speed
    time_delay --> how long the movement is held
 */
-void moveRatioTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool dir, bool turn, float speed_percentage, float ratio, int time_delay) {
+void moveRatioTurn(bool dir, bool turn, float speed_percentage, float ratio, int time_delay) {
   // Sets direction based on dir
   if (dir) {
     digitalWrite(in1R, LOW);
@@ -30,12 +32,12 @@ void moveRatioTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool 
 
   // Sets movement speed
   if (turn) {
-    analogWrite(ER, int(255 * speed_percentage * ratio));
-    analogWrite(EL, int(255 * speed_percentage));
+    analogWrite(ER, int(rightSpeed * speed_percentage * ratio));
+    analogWrite(EL, int(leftSpeed * speed_percentage));
   }
   else {
-    analogWrite(ER, int(255 * speed_percentage));
-    analogWrite(EL, int(255 * speed_percentage * ratio));
+    analogWrite(ER, int(rightSpeed * speed_percentage));
+    analogWrite(EL, int(leftSpeed * speed_percentage * ratio));
   }
 
   // Sets duration of pulse
@@ -52,7 +54,7 @@ void moveRatioTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool 
    speed_percentage --> percentage of full speed
    time_delay --> how long the movement is held
 */
-void movePointTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool turn, float speed_percentage, int time_delay) {
+void movePointTurn(bool turn, float speed_percentage, int time_delay) {
   // Sets direction based on turn
   if (turn) {
     digitalWrite(in1R, HIGH);
@@ -68,8 +70,8 @@ void movePointTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool 
   }
 
   // Sets movement speed
-  analogWrite(ER, int(255 * speed_percentage));
-  analogWrite(EL, int(255 * speed_percentage));
+  analogWrite(ER, int(rightSpeed * speed_percentage));
+  analogWrite(EL, int(leftSpeed * speed_percentage));
 
   // Sets duration of pulse
   delay(time_delay);
@@ -85,7 +87,7 @@ void movePointTurn(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool 
    speed_percentage --> percentage of full speed
    time_delay --> how long the movement is held
 */
-void moveStraight(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool dir, float speed_percentage, int time_delay) {
+void moveStraight(bool dir, float speed_percentage, int time_delay) {
   // Sets direction based on dir (true = forward, false = backward)
   if (dir) {
     digitalWrite(in1R, LOW);
@@ -101,8 +103,8 @@ void moveStraight(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool d
   }
 
   // Sets movement speed
-  analogWrite(ER, int(255 * speed_percentage));
-  analogWrite(EL, int(255 * speed_percentage));
+  analogWrite(ER, int(rightSpeed * speed_percentage));
+  analogWrite(EL, int(leftSpeed * speed_percentage));
 
   // Sets duration of pulse
   delay(time_delay);
@@ -113,47 +115,47 @@ void moveStraight(int in1R, int in2R, int ER, int in1L, int in2L, int EL, bool d
 }
 
 void setup() {
-  pinMode(in1Right, OUTPUT);
-  pinMode(in2Right, OUTPUT);
-  pinMode(enableRight, OUTPUT);
-  pinMode(in1Left, OUTPUT);
-  pinMode(in2Left, OUTPUT);
-  pinMode(enableLeft, OUTPUT);
+  pinMode(in1R, OUTPUT);
+  pinMode(in2R, OUTPUT);
+  pinMode(ER, OUTPUT);
+  pinMode(in1L, OUTPUT);
+  pinMode(in2L, OUTPUT);
+  pinMode(EL, OUTPUT);
   Serial.begin(9600);
 }
 
 void loop() {
   
   Serial.println("Forward 100%");
-  moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 0.75, 2000);
+  moveStraight(true, 0.75, 2000);
   delay(1000);
   
   Serial.println("Backward 100%");
-  moveStraight(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 2000);
+  moveStraight(false, 1.0, 2000);
   delay(1000);
   
   Serial.println("Right Point Turn 100%");
-  movePointTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, 1.0, 2000);
+  movePointTurn(true, 1.0, 2000);
   delay(1000);
   
   Serial.println("Left Point Turn 100%");
-  movePointTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, 1.0, 2000);
+  movePointTurn(false, 1.0, 2000);
   delay(1000);
   
   Serial.println("Right 50% Ratio Turn 100% forward");
-  moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, true, 0.5, 1.0, 2000);
+  moveRatioTurn(true, true, 1.0, 0.5, 2000);
   delay(1000);
   
   Serial.println("Left 50% Ratio Turn 100% forward");
-  moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, true, false, 0.5, 1.0, 2000);
+  moveRatioTurn(true, false, 1.0, 0.5, 2000);
   delay(1000);
   
   Serial.println("Right 50% Ratio Turn 100% backward");
-  moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, true, 0.5, 1.0, 2000);
+  moveRatioTurn(false, true, 1.0, 0.5, 2000);
   delay(1000);
   
   Serial.println("Left 50% Ratio Turn 100% backward");
-  moveRatioTurn(in1Right, in2Right, enableRight, in1Left, in2Left, enableLeft, false, false, 0.5, 1.0, 2000);
+  moveRatioTurn(false, false, 1.0, 0.5, 2000);
   delay(1000);
   
 }
