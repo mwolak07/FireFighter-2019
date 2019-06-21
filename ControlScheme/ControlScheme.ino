@@ -172,7 +172,7 @@ void moveStraight(bool dir, float speed_percentage, int time_delay) {
    Uses ratio turns to maintain distance from the right wall (ultrasonic)
 */
 void wallControl(int minDistance, int maxDistance, int blankDistance) {
-  int straightTime = 750;
+  int straightTime = 900;
   int turnTime = 300;
 
   int rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
@@ -200,13 +200,13 @@ void wallControl(int minDistance, int maxDistance, int blankDistance) {
     }
     // Empty space to the right, robot turns 90 degrees right
     else {
-      moveRatioTurn(true, true, 1.0, 0.0, 3000);
-      moveStraight(true, 1.0, 750);
+      moveRatioTurn(true, true, 1.0, 0.0, 2200);
+      moveStraight(true, 1.0, 2200);
     }
   }
   // Obstacle is in front
   else {
-    moveRatioTurn(true, false, 1.0, 0.0, 2000);
+    moveRatioTurn(true, false, 1.0, 0.0, 1800);
   }
 
 
@@ -285,19 +285,16 @@ void setup() {
 }
 
 void loop() {
-  //  // Checking for flames and making sure isFlame has not already been set
-  //  if (!isFlame && checkForFlames()) {
-  //    isFlame = true;
-  //  }
-  //  // Flame was detected, use flame control scheme
-  //  if (isFlame) {
-  //    flameControl();
-  //  }
-  //  // Flame not detected, use wall control
-  //  else {
-  //    wallControl(7, 12, 22);
-  //  }
-
-  wallControl(7, 12, 22);
-  //flameControl();
+    // Checking for flames and making sure isFlame has not already been set
+    if (!isFlame && checkForFlames()) {
+      isFlame = true;
+    }
+    // Flame was detected, use flame control scheme
+    if (isFlame) {
+      flameControl();
+    }
+    // Flame not detected, use wall control
+    else {
+      wallControl(8, 13, 23);
+    }
 }
