@@ -279,6 +279,7 @@ void setup() {
     getUltrasonicDistance(trigFront, echoFront, 10000);
     getUltrasonicDistance(trigRight, echoRight, 10000);
   }
+  
   delay(3000); // Minimum 850 for servo
   Serial.begin(9600);
 }
