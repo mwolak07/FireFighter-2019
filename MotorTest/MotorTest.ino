@@ -5,7 +5,7 @@ int in1L = 12;
 int in2L = 13;
 int EL = 6;
 int rightSpeed = 255; // Account for differences in motor speed
-int leftSpeed = 250;
+int leftSpeed = 145;
 
 /* Moves L & R motors in a turn with a ratio between inside and outside
    pins on L298N driver are given to the method first
@@ -127,35 +127,34 @@ void setup() {
 void loop() {
   
   Serial.println("Forward 100%");
-  moveStraight(true, 0.75, 2000);
-  delay(1000);
-  
-  Serial.println("Backward 100%");
   moveStraight(false, 1.0, 2000);
-  delay(1000);
-  
-  Serial.println("Right Point Turn 100%");
-  movePointTurn(true, 1.0, 2000);
-  delay(1000);
-  
-  Serial.println("Left Point Turn 100%");
-  movePointTurn(false, 1.0, 2000);
-  delay(1000);
-  
-  Serial.println("Right 50% Ratio Turn 100% forward");
-  moveRatioTurn(true, true, 1.0, 0.5, 2000);
-  delay(1000);
-  
-  Serial.println("Left 50% Ratio Turn 100% forward");
-  moveRatioTurn(true, false, 1.0, 0.5, 2000);
-  delay(1000);
-  
-  Serial.println("Right 50% Ratio Turn 100% backward");
-  moveRatioTurn(false, true, 1.0, 0.5, 2000);
-  delay(1000);
-  
-  Serial.println("Left 50% Ratio Turn 100% backward");
-  moveRatioTurn(false, false, 1.0, 0.5, 2000);
-  delay(1000);
+
+//  Serial.println("Backward 100%");
+//  moveStraight(false, 1.0, 2000);
+//  delay(1000);
+//  
+//  Serial.println("Right Point Turn 100%");
+//  movePointTurn(true, 1.0, 2000);
+//  delay(1000);
+//  
+//  Serial.println("Left Point Turn 100%");
+//  movePointTurn(false, 1.0, 2000);
+//  delay(1000);
+//  
+//  Serial.println("Right 50% Ratio Turn 100% forward");
+//  moveRatioTurn(true, true, 1.0, 0.5, 2000);
+//  delay(1000);
+//  
+//  Serial.println("Left 50% Ratio Turn 100% forward");
+//  moveRatioTurn(true, false, 1.0, 0.5, 2000);
+//  delay(1000);
+//  
+//  Serial.println("Right 50% Ratio Turn 100% backward");
+//  moveRatioTurn(false, true, 1.0, 0.5, 2000);
+//  delay(1000);
+//  
+//  Serial.println("Left 50% Ratio Turn 100% backward");
+//  moveRatioTurn(false, false, 1.0, 0.5, 2000);
+//  delay(1000);
   
 }
