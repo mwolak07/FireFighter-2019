@@ -13,15 +13,15 @@ int trigFront = 3;
 int FSRight = A2;
 int FSCenter = A1;
 int FSLeft = A0;
-int rightSpeed = 255; // Account for differences in motor speed
-int leftSpeed = 245;
+int rightSpeed = 255;
+int leftSpeed = 245; // Lower Value accounts for difference in hardware motor speed
 
 
 Servo swatterServo;
 
 /* Performs swatting motion to extinguish flame
    Moves servo to maxAngle degrees, holds it extended for holdTime seconds,
-   and returs it to the upright position, repeating this for the
+   and returns it to the upright position, repeating this for the
    specified number of swats, with movement delay proportional to the angle
 */
 void swat(Servo servo, int swatNumber, float holdTime, int maxAngle) {
@@ -176,23 +176,24 @@ void initialControl(int minDistance, int maxDistance, int blankDistance) {
 
   int rightDistance = getUltrasonicDistance(trigRight, echoRight, 10000);
   int frontDistance = getUltrasonicDistance(trigFront, echoFront, 10000);
+
   Serial.print(frontDistance);
   Serial.print("  ");
   Serial.println(rightDistance);
 
   // Checks for obstacle in front
-  if(frontDistance > 15 || frontDistance == 0) {
+  if (frontDistance > 15 || frontDistance == 0) {
     // Ensures robot has wall on right, not empty space
-    if(rightDistance != 0 && rightDistance < blankDistance) {
-      moveStraight(true, 1.0, straightTime);
+    if (rightDistance != 0 && rightDistance < blankDistance) {
+      moveStraight(true, 1.0, straightTime); // Maybe put this after the turns?
 
       // Too close to wall, turns left
-      if(rightDistance < minDistance) {
+      if (rightDistance < minDistance) {
         moveRatioTurn(true, false, 1.0, 0.0, turnTime);
       }
 
       // Too far from wall, turns right
-      else if(rightDistance > maxDistance) {
+      else if (rightDistance > maxDistance) {
         moveRatioTurn(true, true, 1.0, 0.0, turnTime);
       }
     }
@@ -208,37 +209,38 @@ void initialControl(int minDistance, int maxDistance, int blankDistance) {
     moveRatioTurn(true, false, 1.0, 0.0, 1000);
   }
 }
- /* Moves robot to the flame source
-    If the flame is on the left, robot ratio turns left until right detects it
-    If the flame is on the right, robot ratio turns right until left detects it
-    If the less sensitive center detects something, robot is close, and swatter is activated
-  */
+/* Moves robot to the flame source
+   If the flame is on the left, robot ratio turns left until right detects it
+   If the flame is on the right, robot ratio turns right until left detects it
+   If the less sensitive center detects something, robot is close, and swatter is activated
+*/
 void flameControl() {
   int rightReading = analogRead(FSRight);
   int centerReading = analogRead(FSCenter);
   int leftReading = analogRead(FSLeft);
 
   // Flame is on the right
-  if(rightReading < 500 && leftReading > 500) {
+  if (rightReading < 500 && leftReading > 500) {
     // Waits for left sensor
-    while(leftReading > 500) {
+    while (leftReading > 500) {
       moveRatioTurn(true, true, 1.0, 0.0, 5);
       leftReading = analogRead(FSLeft);
     }
   }
 
   // Flame is on the left
-  else if(leftReading < 500 && rightReading > 500) {
+  else if (leftReading < 500 && rightReading > 500) {
     // Waits for right sensor
-    while(rightReading > 500) {
+    while (rightReading > 500) {
       moveRatioTurn(true, false, 1.0, 0.0, 5);
       rightReading = analogRead(FSRight);
     }
   }
 
-  // Center has detected it, swat the flame
-  else if(centerReading < 500 || (rightReading < 500 && leftReading < 500)) {
+  // The flame is within swatting range
+  if (centerReading < 500 || (rightReading < 500 && leftReading < 500)) {
     swat(swatterServo, 4, 0.5, 15);
+    delay(1000);
   }
 }
 
@@ -259,7 +261,7 @@ void setup() {
   swatterServo.attach(10);
   swatterServo.write(0); //Initialize servo to raised position
   // Initializing ultrasonics
-  for(int i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++) {
     getUltrasonicDistance(trigFront, echoFront, 10000);
     getUltrasonicDistance(trigRight, echoRight, 10000);
   }
@@ -268,33 +270,6 @@ void setup() {
 }
 
 void loop() {
-  // initialControl(7, 12, 22);
-  // flameControl();
-
-  int rightReading = analogRead(FSRight);
-  int centerReading = analogRead(FSCenter);
-  int leftReading = analogRead(FSLeft);
-  
-  // Center has detected it, swat the flame
-  if(centerReading < 500 || (rightReading < 500 && leftReading < 500)) {
-    swat(swatterServo, 4, 0.5, 15);
-    delay(1000);
-  }
-  /*
-    moveStraight(true, 1.0, 10);
-  */
-  /*
-    int turnTime = 475;
-    int turnAngle = 0.0;
-    moveRatioTurn(true, false, 1.0, turnAngle, turnTime); // Turns out
-    moveStraight(true, 1.0, 750);
-    moveRatioTurn(true, true, 1.0, turnAngle, turnTime); // Straightens out
-    delay(1000);
-    moveStraight(true, 1.0, 1000);
-    delay(1000);
-    moveRatioTurn(true, true, 1.0, turnAngle, turnTime); // Turns out
-    moveStraight(true, 1.0, 750);
-    moveRatioTurn(true, false, 1.0, turnAngle, turnTime); // Straightens out
-    delay(1000);
-  */
+  initialControl(7, 12, 22);
+  flameControl();
 }
