@@ -293,7 +293,6 @@ void setup() {
 }
 
 void loop() {
-  /*
     // Checking for flames and making sure isFlame has not already been set
     if (!isFlame && checkForFlames()) {
       isFlame = true;
@@ -306,6 +305,4 @@ void loop() {
     else {
       wallControl(15, 20, 40);
     }
-    */
-    flameControl();
 }
