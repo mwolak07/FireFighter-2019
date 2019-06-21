@@ -232,7 +232,7 @@ void flameControl() {
   int leftReading = analogRead(FSLeft);
 
   // Flame is on the right
-  if (rightReading < 500 && leftReading > 500 && centerReading > 500) {
+  if (rightReading < 500 && leftReading > 500) {
     // Waits for left sensor
     while (leftReading > 500) {
       moveRatioTurn(true, true, 1.0, 0.0, 5);
@@ -242,7 +242,7 @@ void flameControl() {
   }
 
   // Flame is on the left
-  else if (leftReading < 500 && rightReading > 500 && centerReading > 500) {
+  else if (leftReading < 500 && rightReading > 500) {
     // Waits for right sensor
     while (rightReading > 500) {
       moveRatioTurn(true, false, 1.0, 0.0, 5);
@@ -252,8 +252,8 @@ void flameControl() {
   }
 
   // The flame is within swatting range
-  else if (centerReading < 500 || (rightReading < 500 && leftReading < 500)) {
-    swat(swatterServo, 4, 0.5, 15);
+  else if (centerReading < 500 & rightReading < 500 && leftReading < 500) {
+    swat(swatterServo, 4, 0.5, 30);
     delay(1000);
   }
 }
