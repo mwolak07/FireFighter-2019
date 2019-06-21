@@ -14,7 +14,7 @@ int FSRight = A2;
 int FSCenter = A1;
 int FSLeft = A0;
 int rightSpeed = 255;
-int leftSpeed = 245; // Lower Value accounts for difference in hardware motor speed
+int leftSpeed = 120; // Lower Value accounts for difference in hardware motor speed
 
 bool isFlame = false;
 
@@ -187,7 +187,7 @@ void wallControl(int minDistance, int maxDistance, int blankDistance) {
     // Ensures robot has wall on right, not empty space
     if (rightDistance != 0 && rightDistance < blankDistance) {
       moveStraight(true, 1.0, straightTime);
-      
+
       // Too close to wall, turns left
       if (rightDistance < minDistance) {
         moveRatioTurn(true, false, 1.0, 0.0, turnTime);
@@ -285,16 +285,19 @@ void setup() {
 }
 
 void loop() {
-  // Checking for flames and making sure isFlame has not already been set
-  if (!isFlame && checkForFlames()) {
-    isFlame = true;
-  }
-  // Flame was detected, use flame control scheme
-  if (isFlame) {
-    flameControl();
-  } 
-  // Flame not detected, use wall control
-  else {
-    wallControl(7, 12, 22);
-  }
+  //  // Checking for flames and making sure isFlame has not already been set
+  //  if (!isFlame && checkForFlames()) {
+  //    isFlame = true;
+  //  }
+  //  // Flame was detected, use flame control scheme
+  //  if (isFlame) {
+  //    flameControl();
+  //  }
+  //  // Flame not detected, use wall control
+  //  else {
+  //    wallControl(7, 12, 22);
+  //  }
+
+  wallControl(7, 12, 22);
+  //flameControl();
 }
