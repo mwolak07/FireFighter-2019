@@ -16,6 +16,7 @@ int FSLeft = A0;
 int rightSpeed = 255;
 int leftSpeed = 245; // Lower Value accounts for difference in hardware motor speed
 
+bool isFlame = false;
 
 Servo swatterServo;
 
@@ -273,22 +274,25 @@ void setup() {
 
   swatterServo.attach(10);
   swatterServo.write(0); //Initialize servo to raised position
-  
+
   // Initializing ultrasonics
   for (int i = 0; i < 5; i++) {
     getUltrasonicDistance(trigFront, echoFront, 10000);
     getUltrasonicDistance(trigRight, echoRight, 10000);
   }
-  
+
   delay(3000); // Minimum 850 for servo
   Serial.begin(9600);
 }
 
 void loop() {
-  // Decides which control scheme to use based on presence of flames
   if (checkForFlames()) {
+    isFlame = true;
+  }
+
+  if (isFlame) {
     flameControl();
   } else {
-    initialControl(7, 12, 22);
+    initialControl();
   }
 }
