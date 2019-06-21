@@ -171,7 +171,7 @@ void moveStraight(bool dir, float speed_percentage, int time_delay) {
    Turns left if a wall is detected in front (ultrasonic)
    Uses ratio turns to maintain distance from the right wall (ultrasonic)
 */
-void initialControl(int minDistance, int maxDistance, int blankDistance) {
+void wallControl(int minDistance, int maxDistance, int blankDistance) {
   int straightTime = 375;
   int turnTime = 150;
 
@@ -215,10 +215,10 @@ void initialControl(int minDistance, int maxDistance, int blankDistance) {
 
 // Checks if there is a flame within the vicinity of the robot
 bool checkForFlames() {
-  if (analogRead(FSRight); < 500 || analogRead(FSCenter); < 500 || analogRead(FSLeft); < 500) {
+  if (analogRead(FSRight) < 500 || analogRead(FSCenter) < 500 || analogRead(FSLeft) < 500) {
     return true;
   }
-  return false
+  return false;
 }
 
 
@@ -281,18 +281,21 @@ void setup() {
     getUltrasonicDistance(trigRight, echoRight, 10000);
   }
 
-  delay(3000); // Minimum 850 for servo
+  delay(3000); // Initial delay, minimum 850 to wait for servo
   Serial.begin(9600);
 }
 
 void loop() {
-  if (checkForFlames()) {
+  // Checking for flames and making sure isFlame has not already been set
+  if (!isFlame && checkForFlames()) {
     isFlame = true;
   }
-
+  // Flame was detected, use flame control scheme
   if (isFlame) {
     flameControl();
-  } else {
-    initialControl();
+  } 
+  // Flame not detected, use wall control
+  else {
+    wallControl(7, 12, 22);
   }
 }
